@@ -1,11 +1,22 @@
 import os
 import numpy as np
+import pandas as pd
 import random
+import cv2
 from sklearn.metrics import roc_curve, auc
 import torch
 import matplotlib.pyplot as plt
 import io
 import tensorflow as tf
+
+
+def preprocessing(df, image_dir, image_width, image_height, filename):
+    images = dict()
+    for image_name in df['image_name'].values.tolist():
+        image = cv2.imread(f"{image_dir}/{image_name}.jpg")
+        images[image_name] = cv2.resize(image, (image_width, image_height))
+
+    np.save(filename, images)
 
 
 def seed_torch(seed):

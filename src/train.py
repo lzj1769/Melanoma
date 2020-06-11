@@ -26,16 +26,16 @@ def parse_args():
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                         help='use pre-trained model')
     parser.add_argument("--fold", type=int, default=0)
-    parser.add_argument("--num_workers", default=36, type=int,
+    parser.add_argument("--image_height", default=224, type=int)
+    parser.add_argument("--image_width", default=224, type=int)
+    parser.add_argument("--num_workers", default=24, type=int,
                         help="How many sub-processes to use for data.")
-    parser.add_argument("--per_gpu_batch_size", default=6, type=int,
+    parser.add_argument("--per_gpu_batch_size", default=32, type=int,
                         help="Batch size per GPU/CPU for training.")
     parser.add_argument("--learning_rate", default=3e-4, type=float,
                         help="The initial learning rate for Adam.")
     parser.add_argument("--weight_decay", default=1e-4, type=float,
                         help="Weight decay if we apply some.")
-    parser.add_argument("--image_width", default=256, type=int)
-    parser.add_argument("--image_height", default=256, type=int)
     parser.add_argument("--log",
                         action="store_true",
                         help='write training history')
@@ -111,35 +111,19 @@ def main():
         exit(0)
     else:
         args.device = torch.device("cuda")
-        args.n_gpus = torch.cuda.device_count()
-        print(f"available cuda: {args.n_gpus}")
 
     # Setup model
     model = MelanomaNet(arch=args.arch)
-    model_path = f'{configure.MODEL_PATH}/{args.arch}_fold_{args.fold}.pth'
-
-    if args.resume:
-        assert os.path.exists(model_path), "checkpoint does not exist"
-        state_dict = torch.load(model_path)
-        valid_score = state_dict['valid_score']
-        threshold = state_dict['threshold']
-        print(f"load model from checkpoint, threshold: {threshold}, valid score: {state_dict['valid_score']:0.3f}")
-        model.load_state_dict(state_dict['state_dict'])
-        best_score = valid_score
-        args.learning_rate = 3e-05
-    else:
-        best_score = 0.0
-
-    if args.n_gpus > 1:
-        model = torch.nn.DataParallel(module=model)
     model.to(args.device)
+    model_path = f'{configure.MODEL_PATH}/{args.arch}_{args.image_width}_{args.image_height}_fold_{args.fold}.pth'
 
     # Setup data
-    total_batch_size = args.per_gpu_batch_size * args.n_gpus
-    train_loader, valid_loader = datasets.get_dataloader(
-        fold=args.fold,
-        batch_size=total_batch_size,
-        num_workers=args.num_workers)
+    train_loader, valid_loader = datasets.get_dataloader(image_dir=configure.TRAIN_IMAGE_PATH,
+                                                         image_width=args.image_width,
+                                                         image_height=args.image_height,
+                                                         fold=args.fold,
+                                                         batch_size=args.per_gpu_batch_size,
+                                                         num_workers=args.num_workers)
 
     # define loss function (criterion) and optimizer
     criterion = torch.nn.BCEWithLogitsLoss()
@@ -151,15 +135,15 @@ def main():
 
     """ Train the model """
     current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-    log_prefix = f'{current_time}_{args.arch}_fold_{args.fold}_{args.patch_size}_{args.num_patches}'
-    log_dir = os.path.join(configure.TRAINING_LOG_PATH,
-                           log_prefix)
+    log_prefix = f'{current_time}_{args.arch}_{args.image_width}_{args.image_height}_fold_{args.fold}'
+    log_dir = os.path.join(configure.TRAINING_LOG_PATH, log_prefix)
 
     tb_writer = None
     if args.log:
         tb_writer = SummaryWriter(log_dir=log_dir)
 
     print(f'training started: {current_time}')
+    best_score = 0.0
     for epoch in range(args.epochs):
         train_loss = train(
             dataloader=train_loader,
@@ -190,7 +174,7 @@ def main():
 
         if valid_score > best_score:
             best_score = valid_score
-            state = {'state_dict': model.module.state_dict(),
+            state = {'state_dict': model.state_dict(),
                      'train_loss': train_loss,
                      'valid_loss': valid_loss,
                      'valid_score': valid_score}
