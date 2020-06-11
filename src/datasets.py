@@ -3,6 +3,7 @@ import cv2
 import torch
 from torch.utils.data import Dataset, DataLoader
 from albumentations import RandomRotate90, Transpose, ShiftScaleRotate, Flip, Compose
+from albumentations import RandomResizedCrop
 
 import configure
 
@@ -20,6 +21,7 @@ class MelanomaDataset(Dataset):
     def __getitem__(self, idx):
         image_name = self.df['image_name'].values[idx]
         image = cv2.imread(f"{self.image_dir}/{image_name}.jpg")
+        image = cv2.resize(image, (512, 512))
 
         if self.transform:
             image = self.transform(image=image)['image']

@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument("--weight_decay", default=1e-4, type=float,
                         help="Weight decay if we apply some.")
     parser.add_argument("--image_width", default=256, type=int)
-    parser.add_argument("--image_height", default=256, type=int, )
+    parser.add_argument("--image_height", default=256, type=int)
     parser.add_argument("--log",
                         action="store_true",
                         help='write training history')
@@ -73,7 +73,7 @@ def valid(dataloader, model, criterion, args):
 
     with torch.no_grad():
         valid_loss = 0.0
-        preds, valid_labels = [], []
+        y_true, y_score = [], []
         for i, (images, target) in enumerate(dataloader):
             bs, c, h, w = images.size()
             images = images.to(args.device)
@@ -88,15 +88,15 @@ def valid(dataloader, model, criterion, args):
 
             output = model(images).view(bs, 8, -1).mean(1).view(-1)
             loss = criterion(output, target.float())
-
-            preds.append(output.detach().cpu().numpy())
-            valid_labels.append(target.detach().cpu().numpy())
             valid_loss += loss.item() / len(dataloader)
 
-        preds = np.concatenate(preds)
-        valid_labels = np.concatenate(valid_labels)
+            y_true.append(target.detach().cpu().numpy())
+            y_score.append(torch.sigmoid(output.detach()).cpu().numpy())
 
-        return valid_loss, valid_labels, preds
+        y_score = np.concatenate(y_score)
+        y_true = np.concatenate(y_true)
+
+        return valid_loss, y_true, y_score
 
 
 def main():
