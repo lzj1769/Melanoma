@@ -2,9 +2,9 @@ import argparse
 import os
 import sys
 import numpy as np
-import pandas as pd
 import warnings
 import torch
+from sklearn.metrics import roc_auc_score
 from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 
@@ -35,7 +35,7 @@ def parse_args():
     parser.add_argument("--weight_decay", default=1e-4, type=float,
                         help="Weight decay if we apply some.")
     parser.add_argument("--image_width", default=256, type=int)
-    parser.add_argument("--image_height", default=256, type=int,)
+    parser.add_argument("--image_height", default=256, type=int, )
     parser.add_argument("--log",
                         action="store_true",
                         help='write training history')
@@ -56,7 +56,6 @@ def train(dataloader, model, criterion, optimizer, args):
     for i, (images, target) in enumerate(dataloader):
         images = images.to(args.device)
         target = target.to(args.device)
-
         output = model(images)
 
         loss = criterion(output.view(-1), target.float())
@@ -76,8 +75,7 @@ def valid(dataloader, model, criterion, args):
         valid_loss = 0.0
         preds, valid_labels = [], []
         for i, (images, target) in enumerate(dataloader):
-            bs, num_patches, c, h, w = images.size()
-
+            bs, c, h, w = images.size()
             images = images.to(args.device)
             target = target.to(args.device)
 
@@ -86,7 +84,7 @@ def valid(dataloader, model, criterion, args):
                                   images.flip(-2), images.flip(-1, -2),
                                   images.transpose(-1, -2), images.transpose(-1, -2).flip(-1),
                                   images.transpose(-1, -2).flip(-2), images.transpose(-1, -2).flip(-1, -2)], 1)
-            images = images.view(-1, num_patches, c, h, w)
+            images = images.view(-1, c, h, w)
 
             output = model(images).view(bs, 8, -1).mean(1).view(-1)
             loss = criterion(output, target.float())
@@ -98,14 +96,7 @@ def valid(dataloader, model, criterion, args):
         preds = np.concatenate(preds)
         valid_labels = np.concatenate(valid_labels)
 
-        threshold = utils.find_threshold(y_true=valid_labels, y_pred=preds)
-        # threshold = [0.5, 1.5, 2.5, 3.5, 4.5]
-
-        isup_preds = pd.cut(preds, [-np.inf] + list(np.sort(threshold)) + [np.inf], labels=[0, 1, 2, 3, 4, 5])
-        score = utils.fast_qwk(isup_preds, valid_labels)
-        cm = confusion_matrix(valid_labels, isup_preds)
-
-        return valid_loss, score, cm, threshold
+        return valid_loss, valid_labels, preds
 
 
 def main():
@@ -177,11 +168,13 @@ def main():
             optimizer=optimizer,
             args=args)
 
-        valid_loss, valid_score, valid_cm, threshold = valid(
+        valid_loss, y_true, y_score = valid(
             dataloader=valid_loader,
             model=model,
             criterion=criterion,
             args=args)
+
+        valid_score = roc_auc_score(y_true=y_true, y_score=y_score)
 
         learning_rate = scheduler.get_lr()[0]
         if args.log:
@@ -191,23 +184,21 @@ def main():
             tb_writer.add_scalar("Score/valid", valid_score, epoch)
 
             # Log the confusion matrix as an image summary.
-            figure = utils.plot_confusion_matrix(valid_cm, class_names=[0, 1, 2, 3, 4, 5], score=valid_score)
-            cm_image = utils.plot_to_image(figure)
-            tb_writer.add_image("Confusion Matrix valid", cm_image, epoch)
+            figure = utils.plot_roc_curve(y_true=y_true, y_score=y_score)
+            figure = utils.plot_to_image(figure)
+            tb_writer.add_image("ROC curve", figure, epoch)
 
         if valid_score > best_score:
             best_score = valid_score
             state = {'state_dict': model.module.state_dict(),
                      'train_loss': train_loss,
                      'valid_loss': valid_loss,
-                     'valid_score': valid_score,
-                     'threshold': np.sort(threshold)}
+                     'valid_score': valid_score}
             torch.save(state, model_path)
 
         current_time = datetime.now().strftime('%b%d_%H-%M-%S')
         print(f"epoch:{epoch:02d}, "
               f"train:{train_loss:0.3f}, valid:{valid_loss:0.3f}, "
-              f"threshold: {np.sort(threshold)}, "
               f"score:{valid_score:0.3f}, best:{best_score:0.3f}, date:{current_time}")
 
         scheduler.step()
