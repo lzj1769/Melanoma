@@ -10,15 +10,6 @@ import io
 import tensorflow as tf
 
 
-def preprocessing(df, image_dir, image_width, image_height, filename):
-    images = dict()
-    for image_name in df['image_name'].values.tolist():
-        image = cv2.imread(f"{image_dir}/{image_name}.jpg")
-        images[image_name] = cv2.resize(image, (image_width, image_height))
-
-    np.save(filename, images)
-
-
 def seed_torch(seed):
     random.seed(seed)
     os.environ['PYTHONHASHSEED'] = str(seed)
@@ -40,7 +31,6 @@ def plot_roc_curve(y_true, y_score):
     plt.ylim([0.0, 1.05])
     plt.xlabel('False Positive Rate')
     plt.ylabel('True Positive Rate')
-    plt.title('Receiver operating characteristic example')
     plt.legend(loc="lower right")
 
     return figure

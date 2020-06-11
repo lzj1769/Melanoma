@@ -16,4 +16,9 @@ TRAINING_LOG_PATH = "/home/rs619065/kaggle/Melanoma/log"
 
 config = {'efficientnet-b0': {'batch_size': 128,
                               'image_width': 224,
-                              'image_height': 224}}
+                              'image_height': 224},
+          'efficientnet-b1': {'batch_size': 16,
+                              'image_width': 512,
+                              'image_height': 512}
+          }
+

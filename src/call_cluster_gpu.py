@@ -1,7 +1,7 @@
 import subprocess
 import configure
 
-model_list = ['efficientnet-b0']
+model_list = ['efficientnet-b1']
 fold_list = [0]
 
 for model in model_list:

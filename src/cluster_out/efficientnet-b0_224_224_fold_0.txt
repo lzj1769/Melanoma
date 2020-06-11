@@ -1,2 +1,13 @@
 Loaded pretrained weights for efficientnet-b0
 training started: Jun11_19-32-11
+epoch:00, train:0.563, valid:0.294, score:0.533, best:0.533, date:Jun11_19-37-08
+epoch:01, train:0.187, valid:0.101, score:0.806, best:0.806, date:Jun11_19-41-40
+epoch:02, train:0.092, valid:0.074, score:0.860, best:0.860, date:Jun11_19-46-15
+epoch:03, train:0.077, valid:0.072, score:0.880, best:0.880, date:Jun11_19-50-50
+epoch:04, train:0.073, valid:0.071, score:0.892, best:0.892, date:Jun11_19-55-22
+epoch:05, train:0.065, valid:0.069, score:0.875, best:0.892, date:Jun11_19-59-55
+epoch:06, train:0.064, valid:0.070, score:0.885, best:0.892, date:Jun11_20-04-30
+epoch:07, train:0.058, valid:0.069, score:0.882, best:0.892, date:Jun11_20-09-00
+epoch:08, train:0.055, valid:0.072, score:0.864, best:0.892, date:Jun11_20-13-34
+epoch:09, train:0.051, valid:0.076, score:0.842, best:0.892, date:Jun11_20-18-09
+epoch:10, train:0.041, valid:0.072, score:0.873, best:0.892, date:Jun11_20-22-42
