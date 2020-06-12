@@ -9,11 +9,9 @@ import configure
 
 
 class MelanomaDataset(Dataset):
-    def __init__(self, df, image_dir, image_width, image_height, train, transform):
+    def __init__(self, df, image_dir, train, transform):
         self.df = df
         self.image_dir = image_dir
-        self.image_width = image_width
-        self.image_height = image_height
         self.train = train
         self.transform = transform
 
@@ -22,8 +20,7 @@ class MelanomaDataset(Dataset):
 
     def __getitem__(self, idx):
         image_name = self.df['image_name'].values[idx]
-        image = cv2.imread(f"{self.image_dir}/{image_name}.jpg")
-        image = cv2.resize(image, (self.image_width, self.image_height))
+        image = cv2.imread(f"{self.image_dir}/{image_name}.jpg", cv2.IMREAD_COLOR)
 
         if self.transform:
             image = self.transform(image=image)['image']
@@ -43,25 +40,26 @@ def get_transforms():
         RandomRotate90(p=0.5),
         Flip(p=0.5),
         Transpose(p=0.5),
-        ShiftScaleRotate(shift_limit=0, scale_limit=0, rotate_limit=90, p=0.5),
+        ShiftScaleRotate(shift_limit=0.0625, scale_limit=0.2, rotate_limit=45, p=0.2),
     ])
 
 
-def get_dataloader(image_dir, image_width, image_height, fold, batch_size, num_workers):
-    df_train = pd.read_csv(f'{configure.SPLIT_FOLDER}/fold_{fold}_train.csv')
-    df_valid = pd.read_csv(f'{configure.SPLIT_FOLDER}/fold_{fold}_valid.csv')
+def get_dataloader(image_dir, fold, batch_size, num_workers):
+    df_fold = pd.read_csv(configure.FOLDER_DF)
+
+    df_train = df_fold[df_fold['fold'] != fold]
+    df_valid = df_fold[df_fold['fold'] == fold]
+
+    print(f"training images:{len(df_train)}")
+    print(f"validation images:{len(df_valid)}")
 
     train_dataset = MelanomaDataset(df=df_train,
                                     image_dir=image_dir,
-                                    image_width=image_width,
-                                    image_height=image_height,
                                     train=True,
                                     transform=get_transforms())
 
     valid_dataset = MelanomaDataset(df=df_valid,
                                     image_dir=image_dir,
-                                    image_width=image_width,
-                                    image_height=image_height,
                                     train=True,
                                     transform=None)
 

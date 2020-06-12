@@ -26,9 +26,7 @@ def parse_args():
     parser.add_argument('--pretrained', dest='pretrained', action='store_true',
                         help='use pre-trained model')
     parser.add_argument("--fold", type=int, default=0)
-    parser.add_argument("--image_height", default=224, type=int)
-    parser.add_argument("--image_width", default=224, type=int)
-    parser.add_argument("--num_workers", default=24, type=int,
+    parser.add_argument("--num_workers", default=36, type=int,
                         help="How many sub-processes to use for data.")
     parser.add_argument("--per_gpu_batch_size", default=32, type=int,
                         help="Batch size per GPU/CPU for training.")
@@ -111,18 +109,21 @@ def main():
         exit(0)
     else:
         args.device = torch.device("cuda")
+        args.n_gpus = torch.cuda.device_count()
+        print(f"available cuda: {args.n_gpus}")
 
     # Setup model
     model = MelanomaNet(arch=args.arch)
+    if args.n_gpus > 1:
+        model = torch.nn.DataParallel(module=model)
     model.to(args.device)
-    model_path = f'{configure.MODEL_PATH}/{args.arch}_{args.image_width}_{args.image_height}_fold_{args.fold}.pth'
+    model_path = f'{configure.MODEL_PATH}/{args.arch}_fold_{args.fold}.pth'
 
     # Setup data
+    total_batch_size = args.per_gpu_batch_size * args.n_gpus
     train_loader, valid_loader = datasets.get_dataloader(image_dir=configure.TRAIN_IMAGE_PATH,
-                                                         image_width=args.image_width,
-                                                         image_height=args.image_height,
                                                          fold=args.fold,
-                                                         batch_size=args.per_gpu_batch_size,
+                                                         batch_size=total_batch_size,
                                                          num_workers=args.num_workers)
 
     # define loss function (criterion) and optimizer
@@ -135,7 +136,7 @@ def main():
 
     """ Train the model """
     current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-    log_prefix = f'{current_time}_{args.arch}_{args.image_width}_{args.image_height}_fold_{args.fold}'
+    log_prefix = f'{current_time}_{args.arch}_fold_{args.fold}'
     log_dir = os.path.join(configure.TRAINING_LOG_PATH, log_prefix)
 
     tb_writer = None
@@ -174,7 +175,7 @@ def main():
 
         if valid_score > best_score:
             best_score = valid_score
-            state = {'state_dict': model.state_dict(),
+            state = {'state_dict': model.module.state_dict(),
                      'train_loss': train_loss,
                      'valid_loss': valid_loss,
                      'valid_score': valid_score}
