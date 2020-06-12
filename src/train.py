@@ -40,7 +40,7 @@ def parse_args():
     parser.add_argument("--resume",
                         action="store_true",
                         help='training model from check point')
-    parser.add_argument("--epochs", default=50, type=int,
+    parser.add_argument("--epochs", default=25, type=int,
                         help="Total number of training epochs to perform.")
     parser.add_argument("--seed", type=int, default=42, help="random seed for initialization")
 
@@ -132,12 +132,11 @@ def main():
                                   lr=args.learning_rate,
                                   weight_decay=args.weight_decay)
 
-    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=10, gamma=0.5)
+    scheduler = torch.optim.lr_scheduler.StepLR(optimizer, step_size=5, gamma=0.5)
 
     """ Train the model """
-    current_time = datetime.now().strftime('%b%d_%H-%M-%S')
-    log_prefix = f'{current_time}_{args.arch}_fold_{args.fold}'
-    log_dir = os.path.join(configure.TRAINING_LOG_PATH, log_prefix)
+    current_time = datetime.now().strftime('%b%d_%H_%M_%S')
+    log_dir = f'{configure.TRAINING_LOG_PATH}/{args.arch}_fold_{args.fold}_{current_time}'
 
     tb_writer = None
     if args.log:
@@ -168,7 +167,7 @@ def main():
             tb_writer.add_scalar("Loss/valid", valid_loss, epoch)
             tb_writer.add_scalar("Score/valid", valid_score, epoch)
 
-            # Log the confusion matrix as an image summary.
+            # Log the roc curve as an image summary.
             figure = utils.plot_roc_curve(y_true=y_true, y_score=y_score)
             figure = utils.plot_to_image(figure)
             tb_writer.add_image("ROC curve", figure, epoch)
@@ -181,14 +180,14 @@ def main():
                      'valid_score': valid_score}
             torch.save(state, model_path)
 
-        current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+        current_time = datetime.now().strftime('%b%d_%H_%M_%S')
         print(f"epoch:{epoch:02d}, "
               f"train:{train_loss:0.3f}, valid:{valid_loss:0.3f}, "
               f"score:{valid_score:0.3f}, best:{best_score:0.3f}, date:{current_time}")
 
         scheduler.step()
 
-    current_time = datetime.now().strftime('%b%d_%H-%M-%S')
+    current_time = datetime.now().strftime('%b%d_%H_%M_%S')
     print(f'training finished: {current_time}')
 
     if args.log:
