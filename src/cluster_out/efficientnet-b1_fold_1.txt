@@ -1,0 +1,11 @@
+available cuda: 2
+Loaded pretrained weights for efficientnet-b1
+training images:46765
+validation images:11692
+training started: Jun12_18_41_46
+epoch:00, train:0.164, valid:0.130, score:0.908, best:0.908, date:Jun12_18_53_26
+epoch:01, train:0.130, valid:0.130, score:0.905, best:0.908, date:Jun12_19_04_54
+epoch:02, train:0.117, valid:0.119, score:0.916, best:0.916, date:Jun12_19_16_34
+epoch:03, train:0.105, valid:0.120, score:0.920, best:0.920, date:Jun12_19_28_09
+epoch:04, train:0.093, valid:0.115, score:0.926, best:0.926, date:Jun12_19_39_44
+epoch:05, train:0.062, valid:0.121, score:0.929, best:0.929, date:Jun12_19_51_24

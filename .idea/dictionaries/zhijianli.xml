@@ -2,8 +2,13 @@
   <dictionary name="zhijianli">
     <words>
       <w>dataloader</w>
+      <w>efficientnet</w>
+      <w>inceptionresnetv</w>
+      <w>inceptionv</w>
       <w>kaggle</w>
+      <w>logit</w>
       <w>preprocessing</w>
+      <w>resnext</w>
     </words>
   </dictionary>
 </component>
