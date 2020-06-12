@@ -4,3 +4,9 @@ training images:46648
 validation images:11809
 training started: Jun12_16-53-50
 epoch:00, train:0.280, valid:0.210, score:0.892, best:0.892, date:Jun12_17-05-33
+epoch:01, train:0.185, valid:0.183, score:0.909, best:0.909, date:Jun12_17-17-11
+epoch:02, train:0.164, valid:0.184, score:0.920, best:0.920, date:Jun12_17-28-45
+epoch:03, train:0.137, valid:0.174, score:0.914, best:0.920, date:Jun12_17-40-14
+epoch:04, train:0.118, valid:0.187, score:0.922, best:0.922, date:Jun12_17-51-51
+epoch:05, train:0.066, valid:0.206, score:0.923, best:0.923, date:Jun12_18-03-24
+epoch:06, train:0.043, valid:0.215, score:0.922, best:0.923, date:Jun12_18-14-57

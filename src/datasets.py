@@ -66,7 +66,7 @@ def get_transforms():
             RandomBrightnessContrast(),
         ], p=0.3),
         HueSaturationValue(p=0.3),
-    ], p=0.5)
+    ], p=0.8)
 
 
 def get_dataloader(image_dir, fold, batch_size, num_workers):

@@ -9,6 +9,7 @@ from torch.utils.tensorboard import SummaryWriter
 from datetime import datetime
 
 from model import MelanomaNet
+from loss import MarginFocalBCEWithLogitsLoss
 import datasets
 import configure
 import utils
@@ -127,7 +128,8 @@ def main():
                                                          num_workers=args.num_workers)
 
     # define loss function (criterion) and optimizer
-    criterion = torch.nn.BCEWithLogitsLoss()
+    # criterion = torch.nn.BCEWithLogitsLoss()
+    criterion = MarginFocalBCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(model.parameters(),
                                   lr=args.learning_rate,
                                   weight_decay=args.weight_decay)
