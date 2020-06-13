@@ -2,7 +2,7 @@ import subprocess
 import configure
 
 model_list = ['efficientnet-b1']
-fold_list = [0]
+fold_list = [0, 1, 2, 3, 4]
 
 for model in model_list:
     batch_size = configure.config[model]['batch_size']

@@ -1,0 +1,31 @@
+available cuda: 2
+Loaded pretrained weights for efficientnet-b1
+training images:46807
+validation images:11650
+training started: Jun12_23_34_22
+epoch:00, train:0.305, valid:0.200, score:0.898, best:0.898, date:Jun12_23_46_00
+epoch:01, train:0.193, valid:0.186, score:0.906, best:0.906, date:Jun12_23_57_36
+epoch:02, train:0.169, valid:0.241, score:0.905, best:0.906, date:Jun13_00_09_12
+epoch:03, train:0.151, valid:0.181, score:0.915, best:0.915, date:Jun13_00_20_53
+epoch:04, train:0.121, valid:0.223, score:0.904, best:0.915, date:Jun13_00_32_46
+epoch:05, train:0.071, valid:0.203, score:0.925, best:0.925, date:Jun13_00_44_19
+epoch:06, train:0.047, valid:0.216, score:0.915, best:0.925, date:Jun13_00_55_55
+epoch:07, train:0.036, valid:0.270, score:0.921, best:0.925, date:Jun13_01_07_31
+epoch:08, train:0.029, valid:0.258, score:0.913, best:0.925, date:Jun13_01_19_10
+epoch:09, train:0.025, valid:0.270, score:0.913, best:0.925, date:Jun13_01_30_45
+epoch:10, train:0.014, valid:0.275, score:0.927, best:0.927, date:Jun13_01_42_17
+epoch:11, train:0.010, valid:0.360, score:0.903, best:0.927, date:Jun13_01_53_51
+epoch:12, train:0.009, valid:0.303, score:0.921, best:0.927, date:Jun13_02_05_26
+epoch:13, train:0.008, valid:0.289, score:0.930, best:0.930, date:Jun13_02_16_55
+epoch:14, train:0.009, valid:0.340, score:0.910, best:0.930, date:Jun13_02_28_32
+epoch:15, train:0.006, valid:0.298, score:0.929, best:0.930, date:Jun13_02_40_05
+epoch:16, train:0.004, valid:0.326, score:0.916, best:0.930, date:Jun13_02_51_36
+epoch:17, train:0.004, valid:0.325, score:0.923, best:0.930, date:Jun13_03_03_07
+epoch:18, train:0.005, valid:0.332, score:0.926, best:0.930, date:Jun13_03_14_46
+epoch:19, train:0.004, valid:0.350, score:0.924, best:0.930, date:Jun13_03_26_11
+epoch:20, train:0.003, valid:0.331, score:0.927, best:0.930, date:Jun13_03_37_42
+epoch:21, train:0.002, valid:0.342, score:0.921, best:0.930, date:Jun13_03_49_11
+epoch:22, train:0.002, valid:0.339, score:0.924, best:0.930, date:Jun13_04_00_41
+epoch:23, train:0.002, valid:0.350, score:0.921, best:0.930, date:Jun13_04_12_18
+epoch:24, train:0.001, valid:0.360, score:0.920, best:0.930, date:Jun13_04_23_52
+training finished: Jun13_04_23_52

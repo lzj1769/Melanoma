@@ -128,8 +128,8 @@ def main():
                                                          num_workers=args.num_workers)
 
     # define loss function (criterion) and optimizer
-    # criterion = torch.nn.BCEWithLogitsLoss()
-    criterion = MarginFocalBCEWithLogitsLoss()
+    criterion = torch.nn.BCEWithLogitsLoss()
+    # criterion = MarginFocalBCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(model.parameters(),
                                   lr=args.learning_rate,
                                   weight_decay=args.weight_decay)
